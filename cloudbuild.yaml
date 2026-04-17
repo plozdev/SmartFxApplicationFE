@@ -12,6 +12,45 @@ steps:
 
   # Step 2: Push Frontend image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest'
+    id: 'push-frontend-image'
+
+  # Step 3: Deploy Frontend to Cloud Run
+  - name: 'gcr.io/cloud-builders/run'
+    args:
+      - 'deploy'
+      - 'smartfx-frontend'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--memory=512Mi'
+      - '--cpu=1'
+    id: 'deploy-frontend'
+
+# Images to push to Artifact Registry
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:$SHORT_SHA'
+
+# Timeout for the build
+timeout: '1800s'
+steps:
+  # Step 1: Build Frontend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:$SHORT_SHA'
+      - '.'
+    id: 'build-frontend-image'
+
+  # Step 2: Push Frontend image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest']
     id: 'push-frontend-image'
 
