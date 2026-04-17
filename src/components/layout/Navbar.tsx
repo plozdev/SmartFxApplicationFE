@@ -10,7 +10,6 @@ export function Navbar({ activeTab, onTabChange }: NavbarProps) {
   return (
     <header className="h-16 px-8 flex items-center justify-between border-b border-border-subtle bg-card-bg sticky top-0 z-50">
       <div className="flex items-center gap-2 cursor-pointer" onClick={() => onTabChange('exchange')}>
-        <div className="bg-accent-green w-7 h-7 rounded-md" />
         <span className="font-extrabold text-xl tracking-tighter text-text-primary">SmartFX <span className="text-[10px] bg-accent-blue px-1.5 py-0.5 rounded text-white font-bold ml-1 uppercase">Pro</span></span>
       </div>
       
