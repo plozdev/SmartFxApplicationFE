@@ -308,46 +308,6 @@ This project is open source and available under the MIT License.
 3. **Customize UI** - Modify components in [src/pages/](src/pages/)
 4. **Add features** - Currency charts, historical rates, notifications
 5. **Deploy** - Use docker-compose or Cloud Build
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/a278a5af-e171-4645-a4aa-238a1044f280
-
-## Run Locally
-
-**Prerequisites:** 
-- Node.js (v18+)
-- SmartFX Backend running on `http://localhost:8080`
-
-### Setup
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Configure environment variables in `.env` or `.env.local`:
-   ```bash
-   # Required: Gemini API Key for AI features
-   GEMINI_API_KEY="your-gemini-api-key"
-   
-   # Backend API URL (update if backend is on different host/port)
-   VITE_BACKEND_URL="http://localhost:8080"
-   
-   # App URL (for self-referential links)
-   APP_URL="http://localhost:3000"
-   ```
-
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-   The app will be available at `http://localhost:3000`
 
 4. Open the app in your browser and ensure:
    - The backend API is running on `http://localhost:8080`
