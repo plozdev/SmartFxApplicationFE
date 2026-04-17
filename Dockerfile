@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine as builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -16,34 +16,20 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Install only production dependencies
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy built assets from builder
+# Copy files from builder
 COPY --from=builder /app/dist ./dist
-
-# Copy server file
+COPY package.json ./
 COPY server.ts ./
 
-# Install tsx for running TypeScript server
-RUN npm install -g tsx
+# Install production dependencies
+RUN npm install --only=production && npm install -g tsx
 
 # Expose port
 EXPOSE 3000
-
-# Environment variables
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV VITE_BACKEND_URL=${VITE_BACKEND_URL:-http://backend:8080}
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
 # Start server
 CMD ["tsx", "server.ts"]
