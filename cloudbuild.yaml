@@ -11,32 +11,12 @@
     args:
       - push
       - us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest
-  - name: 'gcr.io/cloud-builders/run'
-    args:
-      - deploy
-      - smartfx-frontend
-      - --image=us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest
-      - --region=us-central1
-      - --platform=managed
-      - --allow-unauthenticated
-      - --memory=512Mi
-      - --cpu=1
 
 images:
   - us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest
   - us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:$SHORT_SHA
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 timeout: 1800s
-steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/smartfx/smartfx-frontend:latest', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/smartfx/smartfx-frontend:${SHORT_SHA}', '.']
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/smartfx/smartfx-frontend:latest']
-  - name: 'gcr.io/cloud-builders/run'
-    args: ['deploy', 'smartfx-frontend', '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/smartfx/smartfx-frontend:latest', '--region=us-central1', '--platform=managed', '--allow-unauthenticated', '--memory=512Mi', '--cpu=1']
-
-images:
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/smartfx/smartfx-frontend:latest'
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/smartfx/smartfx-frontend:${SHORT_SHA}'
-
-timeout: '1800s'
