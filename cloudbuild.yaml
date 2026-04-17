@@ -1,53 +1,41 @@
 steps:
   # Step 1: Build Frontend Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-frontend:$SHORT_SHA', '.']
+    args: 
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:$SHORT_SHA'
+      - '.'
     id: 'build-frontend-image'
-    dir: 'frontend'
 
-  # Step 2: Build Backend Docker image
+  # Step 2: Push Frontend image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-backend:$SHORT_SHA', '.']
-    id: 'build-backend-image'
-    dir: 'backend'
-
-  # Step 3: Push Frontend image to Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-frontend:$SHORT_SHA']
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest']
     id: 'push-frontend-image'
 
-  # Step 4: Push Backend image to Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-backend:$SHORT_SHA']
-    id: 'push-backend-image'
-
-  # Step 5: Deploy Frontend to Cloud Run
-  - name: 'gcr.io/cloud-builders/gke-deploy'
+  # Step 3: Deploy Frontend to Cloud Run
+  - name: 'gcr.io/cloud-builders/run'
     args:
-      - 'run'
-      - '--filename=frontend/clouddeploy.yaml'
-      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-frontend:$SHORT_SHA'
-      - '--location=us-central1'
+      - 'deploy'
+      - 'smartfx-frontend'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=VITE_BACKEND_URL=http://localhost:8080'
+      - '--memory=512Mi'
+      - '--cpu=1'
     id: 'deploy-frontend'
-    env:
-      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
 
-  # Step 6: Deploy Backend to Cloud Run
-  - name: 'gcr.io/cloud-builders/gke-deploy'
-    args:
-      - 'run'
-      - '--filename=backend/clouddeploy.yaml'
-      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-backend:$SHORT_SHA'
-      - '--location=us-central1'
-    id: 'deploy-backend'
-    env:
-      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
-
-# Push image configuration
+# Images to push to Artifact Registry
 images:
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-frontend:$SHORT_SHA'
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-frontend:latest'
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-backend:$SHORT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:latest'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx/smartfx-frontend:$SHORT_SHA'
+
+# Timeout for the build
+timeout: '1800s'
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/smartfx-repo/smartfx-backend:latest'
 
 # Build configuration
