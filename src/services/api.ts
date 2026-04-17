@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// @ts-ignore - Vite will replace this due to define config
+const backendUrl = process.env.VITE_BACKEND_URL || 'http://localhost:8080';
+
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: `${backendUrl}/api/v1`,
   headers: {
     'Content-Type': 'application/json',
   },
