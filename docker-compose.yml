@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Backend Service
+  backend:
+    image: openjdk:25-jdk-slim
+    container_name: smartfx-backend
+    working_dir: /app
+    volumes:
+      - ../SmartFXApplication:/app
+    ports:
+      - "8080:8080"
+    environment:
+      - FASTFOREX_API_KEY=${FASTFOREX_API_KEY}
+      - JAVA_OPTS=-Dspring.profiles.active=docker
+    command: >
+      bash -c "
+        if [ ! -f mvnw ]; then
+          echo 'Maven wrapper not found. Running with maven instead...';
+          mvn clean spring-boot:run;
+        else
+          ./mvnw clean spring-boot:run;
+        fi
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger-ui.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - smartfx-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartfx-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_BACKEND_URL=http://backend:8080
+      - NODE_ENV=development
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartfx-network
+
+networks:
+  smartfx-network:
+    driver: bridge

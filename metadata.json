@@ -1,0 +1,6 @@
+{
+  "name": "SmartFX",
+  "description": "High-Performance Currency Exchange & Arbitrage Detection Frontend. Find optimal paths, detect arbitrage opportunities, and test with a built-in demo mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
